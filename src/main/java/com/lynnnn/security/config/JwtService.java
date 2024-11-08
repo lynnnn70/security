@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,6 +26,7 @@ public class JwtService {
     private static final String SECRET_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTczMDAzNjM0MCwiaWF0IjoxNzMwMDM2MzQwfQ.UDhYD9DZz-SUk3_025lph7LqVxvK5ixM2Es-upVywuc";
 
     //從 JWT 中提取用戶名
+    //Claims::getSubject 是指向 JWT 的 Payload 部分中的 sub 聲明（主題）。通常是用戶名或用戶 ID，但具體取決於你在生成 JWT 時如何設置
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -54,6 +54,8 @@ public class JwtService {
                 .compact();
     }
 
+    // to validate if the token belongs to this user details
+    // UserDetails 來自Spring security 的UserDetails接口 代表當前經過身份驗證的使用者信息對象
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
@@ -66,7 +68,6 @@ public class JwtService {
     //從 JWT 中提取過期時間
     private Date extractExpirations(String token) {
         return extractClaim(token, Claims::getExpiration);
-
     }
 
     //從 token 中提取所有 Claim
